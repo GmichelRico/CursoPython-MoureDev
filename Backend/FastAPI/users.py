@@ -60,13 +60,33 @@ async def user(user: User):
         return {"error": "El usuario ya existe"}
     else:
         user_list.append(user)
+        return user
 
 #-------------------PUT-------------------
 #Ruta para actualizar un usuario por body
 @app.put("/user/")
 async def user(user: User):
-    user_list = list(filter(lambda user: user.id != user.id, user_list))
-    user_list.append(user)
+    found = False
+
+    for index, saved_user in enumerate(user_list):
+        if saved_user.id == user.id:
+            user_list[index] = user
+            found = True
+            return user
+
+    if not found:
+        return {"error": "No se ha actualizado el usuario"}
+    else:
+        return user
+
+#-------------------DELETE-------------------
+@app.delete("/user/{id}")
+async def user(id: int):
+    for index, saved_user in enumerate(user_list):
+        if saved_user.id == id:
+            user_list.pop(index)
+            return {"message": "Usuario fue eliminado"}
+    return {"error": "No se ha encontrado el usuario"}
 
 
 #Para iniciar el server de FastAPI ejecutar el siguiente comando
